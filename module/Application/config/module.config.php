@@ -8,7 +8,7 @@
  */
 
 return array(
-    'router' => array(
+'router' => array(
         'routes' => array(
             'home' => array(
                 'type' => 'Zend\Mvc\Router\Http\Literal',
@@ -20,6 +20,75 @@ return array(
                     ),
                 ),
             ),
+            'about' => array(
+                'type' => 'Zend\Mvc\Router\Http\Literal',
+                'options' => array(
+                    'route'    => '/about',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action'     => 'about',
+                    ),
+                ),
+            ),
+            'doc' => array(
+                'type' => 'Zend\Mvc\Router\Http\Regex',
+                'options' => array(
+                    'regex'    => '/doc(?<page>\/[a-zA-Z0-9_\-]+)\.html',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action'     => 'doc',
+                    ),
+                    'spec'=>'/doc/%page%.html'
+                ),
+            ),
+            'static' => array(
+                'type' => '\Application\Service\StaticRoute',
+                'options' => array(
+                    'dir_name'         => __DIR__ . '/../view',
+                    'template_prefix'  => 'application/index/static',
+                    'filename_pattern' => '/[a-z0-9_\-]+/',
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action'     => 'static',
+                    ),                    
+                ),
+            ),
+            'barcode' => array(
+                'type' => 'Segment',
+                'options' => array(
+                    'route' => '/barcode[/:type/:label]',
+                    'constraints' => array(
+                        'type' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'label' => '[a-zA-Z0-9_-]*'
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Application\Controller\Index',
+                        'action' => 'barcode',
+                    ),
+                ),
+            ),
+            'blog' => array(
+                'type'    => 'Literal',
+                'options' => array(
+                    'route'    => '/blog',
+                    'defaults' => array(                        
+                    ),
+                ),
+                'may_terminate' => false,
+                'child_routes' => array(
+                    'wildcard' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Wildcard',
+                        'options' => array(                    
+                            'key_value_delimiter' => '/',
+                            'param_delimiter' => '/',
+                            'defaults' => array(
+                                'controller' => 'Application\Controller\Index',
+                                'action'     => 'blog',
+                            ),
+                        ),
+                    ),
+                ),
+            ),            
             // The following is a route to simplify getting started creating
             // new controllers and actions without needing to create a new
             // module. Simply drop new controllers in, and you can access them
@@ -75,6 +144,14 @@ return array(
         'invokables' => array(
             'Application\Controller\Index' => 'Application\Controller\IndexController'
         ),
+    ),
+    // The following registers our custom view
+    // helper classes in view plugin manager.
+    'view_helpers' => array(
+    		'invokables' => array(
+    				'mainMenu' => 'Application\View\Helper\Menu',
+    				'pageBreadcrumbs' => 'Application\View\Helper\Breadcrumbs',
+    		),
     ),
     'view_manager' => array(
         'display_not_found_reason' => true,
